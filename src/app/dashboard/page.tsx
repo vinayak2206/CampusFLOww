@@ -7,7 +7,6 @@ import Timetable from "@/components/dashboard/timetable";
 import TodoList from "@/components/dashboard/todo-list";
 import { mockUser, mockTimetable } from "@/lib/data";
 import type { TimetableEntry, Task } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DashboardPage() {
     const [timetable, setTimetable] = useState<TimetableEntry[]>(mockTimetable);
@@ -22,21 +21,45 @@ export default function DashboardPage() {
             completed: false,
         };
 
-        setTasks(prevTasks => [...prevTasks, newTask]);
-
-        setTimetable(prevTimetable => {
-            const newTimetable = [...prevTimetable];
-            const freeSlotIndex = newTimetable.findIndex(entry => entry.subject === 'Free Slot');
-
-            if (freeSlotIndex !== -1) {
-                newTimetable[freeSlotIndex] = {
-                    ...newTimetable[freeSlotIndex],
+        let taskAddedToTimetable = false;
+        const newTimetable = timetable.map(entry => {
+            if (!taskAddedToTimetable && entry.subject === 'Free Slot') {
+                taskAddedToTimetable = true;
+                return {
+                    ...entry,
                     subject: taskName,
-                    type: 'lecture', // Or a new type like 'task'
+                    type: 'task',
                 };
             }
-            return newTimetable;
+            return entry;
         });
+
+        if (taskAddedToTimetable) {
+            setTimetable(newTimetable);
+        } else {
+            // If no free slot, just add to tasks list
+            setTasks(prevTasks => [...prevTasks, newTask]);
+        }
+    };
+    
+    const handleReplaceTask = (timetableId: number) => {
+        if (tasks.length > 0) {
+            const nextTask = tasks[0];
+            setTasks(prev => prev.slice(1));
+            setTimetable(prevTimetable => {
+                return prevTimetable.map(entry => {
+                    if (entry.id === timetableId) {
+                        return {
+                            ...entry,
+                            subject: nextTask.suggestion,
+                            type: 'task',
+                            status: 'scheduled',
+                        }
+                    }
+                    return entry;
+                })
+            })
+        }
     };
 
     const toggleTimetableStatus = (id: number) => {
@@ -64,7 +87,12 @@ export default function DashboardPage() {
                 academicRisk={mockUser.academicRisk} 
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Timetable timetable={timetable} toggleStatus={toggleTimetableStatus} />
+                <Timetable 
+                    timetable={timetable} 
+                    toggleStatus={toggleTimetableStatus}
+                    tasks={tasks}
+                    replaceTask={handleReplaceTask}
+                />
                 <TodoList tasks={tasks} onAddTask={handleAddTask} />
             </div>
         </div>

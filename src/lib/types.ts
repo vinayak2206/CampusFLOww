@@ -15,7 +15,7 @@ export type TimetableEntry = {
   startTime: string;
   endTime: string;
   status: 'scheduled' | 'cancelled';
-  type: 'lecture' | 'lab' | 'break';
+  type: 'lecture' | 'lab' | 'break' | 'task';
 };
 
 export type AcademicMetrics = {
