@@ -11,11 +11,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Timer, Play, Pause, RotateCcw, Plus, Minus } from 'lucide-react';
 import { Progress } from '@/components/ui/progress-ring';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 export function FocusTimerCard() {
   const [minutes, setMinutes] = useState(25);
@@ -23,6 +24,9 @@ export function FocusTimerCard() {
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [initialTime, setInitialTime] = useState(25 * 60);
+  const [subject, setSubject] = useState('');
+  const [taskType, setTaskType] = useState('');
+  
   const { toast } = useToast();
 
   const totalSeconds = minutes * 60 + seconds;
@@ -45,6 +49,7 @@ export function FocusTimerCard() {
             title: 'Session Complete!',
             description: `Great job focusing for ${initialTime / 60} minutes.`,
           });
+          // Here you would log the completed session to Firestore
         }
       }, 1000);
     } else if (!isActive && seconds !== 0) {
@@ -70,10 +75,18 @@ export function FocusTimerCard() {
 
 
   const handleStart = () => {
-    if (minutes === 0 && seconds === 0) return;
+    if ((minutes === 0 && seconds === 0) || !subject || !taskType) {
+        toast({
+            variant: 'destructive',
+            title: 'Missing information',
+            description: 'Please select a subject and task type before starting.',
+        })
+        return;
+    }
     setInitialTime(minutes * 60 + seconds);
     setIsActive(true);
     setIsPaused(false);
+    // Here you would create the /liveStudySessions/{userId} document
   };
   
   const handlePauseResume = () => {
@@ -84,6 +97,9 @@ export function FocusTimerCard() {
     setIsActive(false);
     setIsPaused(false);
     setTime(25);
+    setSubject('');
+    setTaskType('');
+    // Here you would delete the /liveStudySessions/{userId} document and log the (interrupted) session
   };
 
   const timePresets = [15, 25, 50, 60];
@@ -96,7 +112,7 @@ export function FocusTimerCard() {
             Focus Zone
         </CardTitle>
         <CardDescription>
-          Start a timed session to concentrate on a single task.
+          Select a subject and task, then start a timed session.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center gap-6">
@@ -114,6 +130,31 @@ export function FocusTimerCard() {
             </div>
         </div>
         <div className="w-full space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+                <Select value={subject} onValueChange={setSubject} disabled={isActive}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Data Structures">Data Structures</SelectItem>
+                        <SelectItem value="Algorithms">Algorithms</SelectItem>
+                        <SelectItem value="Operating Systems">Operating Systems</SelectItem>
+                        <SelectItem value="Compiler Design">Compiler Design</SelectItem>
+                        <SelectItem value="Mathematics-3">Mathematics-3</SelectItem>
+                    </SelectContent>
+                </Select>
+                 <Select value={taskType} onValueChange={setTaskType} disabled={isActive}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select Task Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Study">Study</SelectItem>
+                        <SelectItem value="Coding">Coding</SelectItem>
+                        <SelectItem value="Assignment">Assignment</SelectItem>
+                        <SelectItem value="Revision">Revision</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
             <div className="flex items-center justify-center gap-2">
                  <Button variant="outline" size="icon" onClick={() => setTime(minutes - 5)} disabled={isActive}>
                     <Minus className="h-4 w-4" />

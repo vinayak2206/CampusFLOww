@@ -9,6 +9,9 @@ import { mockUser, mockWeeklyTimetable } from "@/lib/data";
 import type { TimetableEntry, Task } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { CollegeTimetable } from '@/components/dashboard/college-timetable';
+import { LiveStudyCard } from '@/components/dashboard/live-study-card';
+import { LeaderboardCard } from '@/components/dashboard/leaderboard-card';
+
 
 const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -114,29 +117,32 @@ export default function DashboardPage() {
                 cgpa={mockUser.cgpa} 
             />
             
-            <div className="flex gap-2 items-center flex-wrap">
-                {weekDays.map(day => (
-                    <Button 
-                        key={day}
-                        variant={selectedDay === day ? 'default' : 'outline'}
-                        onClick={() => setSelectedDay(day)}
-                    >
-                        {day}
-                    </Button>
-                ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Timetable 
-                    timetable={weeklyTimetable[selectedDay]} 
-                    toggleStatus={toggleTimetableStatus}
-                    tasks={tasks}
-                    replaceTask={handleReplaceTask}
-                    selectedDay={selectedDay}
-                />
-                <div className="space-y-6">
-                    <TodoList tasks={tasks} onAddTask={handleAddTask} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="flex gap-2 items-center flex-wrap">
+                        {weekDays.map(day => (
+                            <Button 
+                                key={day}
+                                variant={selectedDay === day ? 'default' : 'outline'}
+                                onClick={() => setSelectedDay(day)}
+                            >
+                                {day}
+                            </Button>
+                        ))}
+                    </div>
+                    <Timetable 
+                        timetable={weeklyTimetable[selectedDay]} 
+                        toggleStatus={toggleTimetableStatus}
+                        tasks={tasks}
+                        replaceTask={handleReplaceTask}
+                        selectedDay={selectedDay}
+                    />
                     <CollegeTimetable />
+                </div>
+                <div className="space-y-6">
+                    <LiveStudyCard />
+                    <LeaderboardCard />
+                    <TodoList tasks={tasks} onAddTask={handleAddTask} />
                 </div>
             </div>
         </div>
