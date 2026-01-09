@@ -149,8 +149,8 @@ export default function DashboardPage() {
                     <CollegeTimetable />
                 </div>
                 <div className="space-y-6">
-                    <LiveStudyCard />
                     <TodoList tasks={tasks} onAddTask={handleAddTask} />
+                    <LiveStudyCard />
                 </div>
             </div>
         </div>
