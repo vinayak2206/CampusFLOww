@@ -68,7 +68,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
             const newDaySchedule = daySchedule.map(entry => {
                 if (!taskAddedToTimetable && entry.subject === 'Free Slot') {
                     taskAddedToTimetable = true;
-                    return { ...entry, subject: task.suggestion, type: 'task' as const };
+                    return { ...entry, subject: task.suggestion, type: 'task' as const, status: 'scheduled' as const };
                 }
                 return entry;
             });
@@ -137,7 +137,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     
             const newDaySchedule = daySchedule.map(entry => {
                 if (entry.subject === subjectName && entry.status === 'scheduled') { // Only update if not already marked
-                     if (entry.type === 'task' && action === 'attend') {
+                     if (entry.type === 'task' && (action === 'attend' || action === 'miss')) {
                         return { ...entry, subject: 'Free Slot', type: 'break' as const, status: 'scheduled' as const };
                     }
                     if (action === 'cancel') {
@@ -147,6 +147,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
                     // For lectures/labs, update attendance
                     if (entry.type === 'lecture' || entry.type === 'lab') {
                         handleAttendanceChange(subjectName, action as 'attend' | 'miss');
+                        return { ...entry, status: action === 'attend' ? 'attended' as const : 'missed' as const };
                     }
 
                     return { ...entry, status: action === 'attend' ? 'attended' as const : 'missed' as const };

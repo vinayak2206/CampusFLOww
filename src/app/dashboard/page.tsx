@@ -23,7 +23,6 @@ export default function DashboardPage() {
     const {
         weeklyTimetable,
         tasks,
-        moveTaskToSchedule,
         addTask,
         moveTaskToScheduleById,
         completeTask,
@@ -36,22 +35,11 @@ export default function DashboardPage() {
     const { toast } = useToast();
     
     const handleAddTask = (taskName: string) => {
-        const moved = moveTaskToSchedule({
-            id: Date.now(),
-            suggestion: taskName,
-            type: 'study',
-            duration: 'Flexible',
-            completed: false,
-        }, selectedDay);
-
-        if (!moved) {
-            addTask(taskName);
-        } else {
-             toast({
-                title: 'Task Scheduled!',
-                description: `"${taskName}" has been added to your ${selectedDay} schedule.`,
-            });
-        }
+        addTask(taskName);
+        toast({
+            title: 'Task Added!',
+            description: `"${taskName}" has been added to your todo list.`,
+        });
     };
 
     const handleMoveTaskToSchedule = (taskId: number) => {
