@@ -243,7 +243,7 @@ export function FocusTimerCard() {
       <CardFooter className="grid grid-cols-2 gap-4">
         {!isActive ? (
             <Button onClick={handleStart} className="col-span-2" disabled={!user}>
-                <Play className="mr-2 h-4 w-4" /> Start Session
+                <Play className="mr-2 h-4 w-4" /> not working
             </Button>
         ) : (
             <>
