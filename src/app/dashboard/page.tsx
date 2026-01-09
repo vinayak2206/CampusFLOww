@@ -10,7 +10,6 @@ import type { TimetableEntry, Task, SubjectAttendance } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { CollegeTimetable } from '@/components/dashboard/college-timetable';
 import { LiveStudyCard } from '@/components/dashboard/live-study-card';
-import { LeaderboardCard } from '@/components/dashboard/leaderboard-card';
 
 
 const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -156,7 +155,6 @@ export default function DashboardPage() {
                 </div>
                 <div className="space-y-6">
                     <LiveStudyCard />
-                    <LeaderboardCard />
                     <TodoList tasks={tasks} onAddTask={handleAddTask} />
                 </div>
             </div>
