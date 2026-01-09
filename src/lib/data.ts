@@ -71,11 +71,11 @@ export const mockTimetable: TimetableEntry[] = [
 const baseSchedule: Omit<TimetableEntry, 'id' | 'day'>[] = [
   { subject: 'Data Structures', startTime: '09:00', endTime: '10:00', status: 'scheduled', type: 'lecture' },
   { subject: 'Algorithms', startTime: '10:00', endTime: '11:00', status: 'scheduled', type: 'lecture' },
-  { subject: 'Free Slot', startTime: '11:00', endTime: '12:00', status: 'scheduled', type: 'break' },
   { subject: 'Operating Systems Lab', startTime: '12:00', endTime: '14:00', status: 'scheduled', type: 'lab' },
   { subject: 'Lunch Break', startTime: '14:00', endTime: '15:00', status: 'scheduled', type: 'break' },
   { subject: 'Mathematics-3', startTime: '15:00', endTime: '16:00', status: 'scheduled', type: 'lecture' },
   { subject: 'Compiler Design', startTime: '16:00', endTime: '17:00', status: 'scheduled', type: 'lecture' },
+  { subject: 'Free Slot', startTime: '17:00', endTime: '18:00', status: 'scheduled', type: 'break' },
 ];
 
 const generateFullWeek = (): { [key: string]: TimetableEntry[] } => {
@@ -89,10 +89,10 @@ const generateFullWeek = (): { [key: string]: TimetableEntry[] } => {
     } else {
         const daySchedule = [...baseSchedule];
         if (day === 'Tuesday' || day === 'Thursday') {
-            daySchedule[3] = { subject: 'DBMS Lab', startTime: '12:00', endTime: '14:00', status: 'scheduled', type: 'lab' };
+            daySchedule[2] = { subject: 'DBMS Lab', startTime: '12:00', endTime: '14:00', status: 'scheduled', type: 'lab' };
         }
          if (day === 'Friday') {
-            daySchedule[5] = { subject: 'Data Structures', startTime: '15:00', endTime: '16:00', status: 'scheduled', type: 'lecture' };
+            daySchedule[4] = { subject: 'Data Structures', startTime: '15:00', endTime: '16:00', status: 'scheduled', type: 'lecture' };
         }
       weeklyTimetable[day] = daySchedule.map(entry => ({
         ...entry,

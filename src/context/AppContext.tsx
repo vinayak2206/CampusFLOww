@@ -58,26 +58,43 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const moveTaskToSchedule = (task: Task, day: string) => {
-        let taskAddedToTimetable = false;
-        
         setWeeklyTimetable(prev => {
             const newWeeklyTimetable = { ...prev };
-            const daySchedule = newWeeklyTimetable[day];
-            if (!daySchedule) return prev;
-
-            const newDaySchedule = daySchedule.map(entry => {
-                if (!taskAddedToTimetable && entry.subject === 'Free Slot') {
-                    taskAddedToTimetable = true;
-                    return { ...entry, subject: task.suggestion, type: 'task' as const, status: 'scheduled' as const };
-                }
-                return entry;
-            });
+            const daySchedule = newWeeklyTimetable[day] ? [...newWeeklyTimetable[day]] : [];
             
-            newWeeklyTimetable[day] = newDaySchedule;
+            // Find an existing free slot first
+            const freeSlotIndex = daySchedule.findIndex(entry => entry.subject === 'Free Slot');
+
+            if (freeSlotIndex !== -1) {
+                // Replace the first available free slot
+                daySchedule[freeSlotIndex] = { 
+                    ...daySchedule[freeSlotIndex], 
+                    subject: task.suggestion, 
+                    type: 'task' as const, 
+                    status: 'scheduled' as const 
+                };
+            } else {
+                // If no free slot, append the task to the end
+                const lastEntry = daySchedule[daySchedule.length - 1];
+                const newStartTime = lastEntry ? lastEntry.endTime : '17:00';
+                const newEndTime = lastEntry ? `${parseInt(lastEntry.endTime.split(':')[0]) + 1}:00` : '18:00';
+
+                daySchedule.push({
+                    id: Date.now(),
+                    day: day,
+                    subject: task.suggestion,
+                    startTime: newStartTime,
+                    endTime: newEndTime,
+                    status: 'scheduled',
+                    type: 'task'
+                });
+            }
+            
+            newWeeklyTimetable[day] = daySchedule;
             return newWeeklyTimetable;
         });
         
-        return taskAddedToTimetable;
+        return true; // Assume the move is always successful now
     };
 
     const addTask = (taskName: string) => {
@@ -137,11 +154,14 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     
             const newDaySchedule = daySchedule.map(entry => {
                 if (entry.subject === subjectName && entry.status === 'scheduled') { // Only update if not already marked
-                     if (entry.type === 'task' && (action === 'attend' || action === 'miss')) {
-                        return { ...entry, subject: 'Free Slot', type: 'break' as const, status: 'scheduled' as const };
+                     if (entry.type === 'task') {
+                         if(action === 'attend' || action === 'miss') {
+                            return { ...entry, subject: 'Free Slot', type: 'break' as const, status: 'scheduled' as const };
+                         }
+                         return { ...entry, status: 'cancelled' as const };
                     }
                     if (action === 'cancel') {
-                         return { ...entry, status: 'cancelled' as const };
+                         return { ...entry, subject: 'Free Slot', type: 'break' as const, status: 'scheduled' as const };
                     }
 
                     // For lectures/labs, update attendance
@@ -149,8 +169,6 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
                         handleAttendanceChange(subjectName, action as 'attend' | 'miss');
                         return { ...entry, status: action === 'attend' ? 'attended' as const : 'missed' as const };
                     }
-
-                    return { ...entry, status: action === 'attend' ? 'attended' as const : 'missed' as const };
                 }
                 return entry;
             });
