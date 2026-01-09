@@ -29,6 +29,7 @@ type AttendanceManagerProps = {
   ) => void;
   onReset: (subjectName: string) => void;
   onDelete: (subjectName: string) => void;
+  targetAttendance: number;
 };
 
 export function AttendanceManager({
@@ -37,14 +38,13 @@ export function AttendanceManager({
   onManualUpdate,
   onReset,
   onDelete,
+  targetAttendance,
 }: AttendanceManagerProps) {
   const [editing, setEditing] = useState<
     { subject: string; attended: string; total: string } | undefined
   >(undefined);
 
   const { handleAttendanceChange } = useAppContext();
-
-  const targetAttendance = 75;
 
   const totalAttended = subjects.reduce((sum, s) => sum + s.attended, 0);
   const totalClasses = subjects.reduce((sum, s) => sum + s.total, 0);

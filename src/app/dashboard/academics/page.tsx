@@ -14,6 +14,8 @@ export default function AcademicsPage() {
     deleteSubject,
   } = useAppContext();
 
+  const targetAttendance = 75;
+
   return (
     <div className="space-y-6">
       <h1 className="font-headline text-3xl font-bold tracking-tighter">
@@ -31,6 +33,7 @@ export default function AcademicsPage() {
             onManualUpdate={updateSubjectAttendance}
             onReset={resetSubject}
             onDelete={deleteSubject}
+            targetAttendance={targetAttendance}
           />
         </TabsContent>
         <TabsContent value="cgpa">
