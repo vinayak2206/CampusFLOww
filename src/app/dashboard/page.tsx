@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import WelcomeHeader from "@/components/dashboard/welcome-header";
 import Timetable from "@/components/dashboard/timetable";
 import TodoList from "@/components/dashboard/todo-list";
-import { mockUser, mockWeeklyTimetable, getInitialAttendance } from "@/lib/data";
-import type { TimetableEntry, Task, SubjectAttendance } from '@/lib/types';
+import { mockUser } from "@/lib/data";
 import { Button } from '@/components/ui/button';
 import { CollegeTimetable } from '@/components/dashboard/college-timetable';
 import { LiveStudyCard } from '@/components/dashboard/live-study-card';
 import { useToast } from '@/hooks/use-toast';
+import { useAppContext } from '@/context/AppContext';
 
 
 const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -20,162 +20,65 @@ const getCurrentDay = () => {
 }
 
 export default function DashboardPage() {
-    const [weeklyTimetable, setWeeklyTimetable] = useState<{ [key: string]: TimetableEntry[] }>(mockWeeklyTimetable);
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const {
+        weeklyTimetable,
+        tasks,
+        moveTaskToSchedule,
+        addTask,
+        moveTaskToScheduleById,
+        completeTask,
+        deleteTask,
+        replaceTaskWithNext,
+        updateTimetableEntryStatus
+    } = useAppContext();
+
     const [selectedDay, setSelectedDay] = useState<string>(getCurrentDay());
-    const [subjects, setSubjects] = useState<SubjectAttendance[]>([]);
     const { toast } = useToast();
-
-    useEffect(() => {
-        setSubjects(getInitialAttendance());
-        const initialTasks: Task[] = [
-            { id: 1, suggestion: 'Review DSA Lecture 5', type: 'study', duration: '30m', completed: false },
-            { id: 2, suggestion: 'Finish Compiler Design assignment', type: 'coding', duration: '1h', completed: false },
-        ];
-        setTasks(initialTasks);
-    }, []);
-
-    const moveTaskToSchedule = (task: Task) => {
-         let taskAddedToTimetable = false;
-        
-        setWeeklyTimetable(prev => {
-            const newWeeklyTimetable = { ...prev };
-            const daySchedule = newWeeklyTimetable[selectedDay];
-
-            const newDaySchedule = daySchedule.map(entry => {
-                if (!taskAddedToTimetable && entry.subject === 'Free Slot') {
-                    taskAddedToTimetable = true;
-                    return {
-                        ...entry,
-                        subject: task.suggestion,
-                        type: 'task',
-                    };
-                }
-                return entry;
-            });
-            
-            newWeeklyTimetable[selectedDay] = newDaySchedule;
-            return newWeeklyTimetable;
-        });
-
-        if (taskAddedToTimetable) {
-            toast({
-                title: 'Task Scheduled!',
-                description: `"${task.suggestion}" has been added to your ${selectedDay} schedule.`,
-            });
-            return true;
-        }
-        return false;
-    }
-
+    
     const handleAddTask = (taskName: string) => {
-        const newTask: Task = {
+        const moved = moveTaskToSchedule({
             id: Date.now(),
             suggestion: taskName,
-            type: 'study', // default type
+            type: 'study',
             duration: 'Flexible',
             completed: false,
-        };
+        }, selectedDay);
 
-        const moved = moveTaskToSchedule(newTask);
         if (!moved) {
-            setTasks(prevTasks => [...prevTasks, newTask]);
+            addTask(taskName);
+        } else {
+             toast({
+                title: 'Task Scheduled!',
+                description: `"${taskName}" has been added to your ${selectedDay} schedule.`,
+            });
         }
     };
 
     const handleMoveTaskToSchedule = (taskId: number) => {
-        const taskToMove = tasks.find(t => t.id === taskId);
-        if (taskToMove) {
-            const moved = moveTaskToSchedule(taskToMove);
-            if (moved) {
-                setTasks(prev => prev.filter(t => t.id !== taskId));
-            } else {
-                 toast({
-                    variant: 'destructive',
-                    title: 'No Free Slots!',
-                    description: `There are no available free slots in your ${selectedDay} schedule.`,
+        const moved = moveTaskToScheduleById(taskId, selectedDay);
+        if (!moved) {
+             toast({
+                variant: 'destructive',
+                title: 'No Free Slots!',
+                description: `There are no available free slots in your ${selectedDay} schedule.`,
+            });
+        } else {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                toast({
+                    title: 'Task Scheduled!',
+                    description: `"${task.suggestion}" has been added to your ${selectedDay} schedule.`,
                 });
             }
         }
     };
-    
-    const handleTaskComplete = (taskId: number) => {
-        setTasks(prev => prev.map(t => t.id === taskId ? {...t, completed: !t.completed} : t));
-    };
-
-    const handleTaskDelete = (taskId: number) => {
-        setTasks(prev => prev.filter(t => t.id !== taskId));
-    };
 
     const handleReplaceTask = (day: string, timetableId: number) => {
-        if (tasks.length > 0) {
-            const nextTask = tasks[0];
-            setTasks(prev => prev.slice(1));
-            setWeeklyTimetable(prev => {
-                const newWeeklyTimetable = {...prev};
-                const daySchedule = newWeeklyTimetable[day];
-                const newDaySchedule = daySchedule.map(entry => {
-                    if (entry.id === timetableId) {
-                        return {
-                            ...entry,
-                            subject: nextTask.suggestion,
-                            type: 'task',
-                            status: 'scheduled',
-                        }
-                    }
-                    return entry;
-                })
-                newWeeklyTimetable[day] = newDaySchedule;
-                return newWeeklyTimetable;
-            })
-        }
+        replaceTaskWithNext(day, timetableId);
     };
 
     const handleAttendanceChangeFromTimetable = (subjectName: string, action: 'attend' | 'miss' | 'cancel') => {
-        setWeeklyTimetable(prev => {
-            const newWeeklyTimetable = { ...prev };
-            const daySchedule = newWeeklyTimetable[selectedDay];
-    
-            const newDaySchedule = daySchedule.map(entry => {
-                if (entry.subject === subjectName) {
-                     if (entry.type === 'task' && action === 'attend') {
-                        // If a task is completed, revert it to a free slot
-                        return { 
-                            ...entry, 
-                            subject: 'Free Slot',
-                            type: 'break',
-                            status: 'scheduled' 
-                        };
-                    }
-
-                    if (action === 'cancel') {
-                         return { ...entry, status: 'cancelled' };
-                    }
-                    return { ...entry, status: action === 'attend' ? 'attended' : 'missed' };
-                }
-                return entry;
-            });
-    
-            newWeeklyTimetable[selectedDay] = newDaySchedule;
-            return newWeeklyTimetable;
-        });
-
-        // Only update attendance for lectures/labs, not for tasks
-        if (action !== 'cancel') {
-             const entry = weeklyTimetable[selectedDay].find(e => e.subject === subjectName);
-             if (entry && entry.type === 'lecture') {
-                setSubjects(prevSubjects =>
-                  prevSubjects.map(subject => {
-                    if (subject.name === subjectName) {
-                      const newAttended = action === 'attend' ? subject.attended + 1 : subject.attended;
-                      const newTotal = subject.total + 1;
-                      return { ...subject, attended: newAttended, total: newTotal };
-                    }
-                    return subject;
-                  })
-                );
-            }
-        }
+        updateTimetableEntryStatus(selectedDay, subjectName, action);
     };
     
     return (
@@ -208,8 +111,8 @@ export default function DashboardPage() {
                     <TodoList 
                         tasks={tasks} 
                         onAddTask={handleAddTask}
-                        onTaskComplete={handleTaskComplete}
-                        onTaskDelete={handleTaskDelete}
+                        onTaskComplete={completeTask}
+                        onTaskDelete={deleteTask}
                         onMoveTask={handleMoveTaskToSchedule}
                     />
                     <LiveStudyCard />

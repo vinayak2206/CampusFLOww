@@ -3,57 +3,17 @@
 import { CgpaCalculatorCard } from '@/components/academics/cgpa-calculator-card';
 import { AttendanceManager } from '@/components/academics/attendance-manager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState, useEffect } from 'react';
-import type { SubjectAttendance } from '@/lib/types';
-import { getInitialAttendance } from '@/lib/data';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { Logo } from '@/components/icons';
+import { useAppContext } from '@/context/AppContext';
 
 export default function AcademicsPage() {
-  const [subjects, setSubjects] = useState<SubjectAttendance[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setSubjects(getInitialAttendance());
-    setLoading(false);
-  }, []);
-
-  const handleAttendanceChange = (
-    subjectName: string,
-    action: 'attend' | 'miss'
-  ) => {
-    setSubjects((prevSubjects) =>
-      prevSubjects.map((subject) => {
-        if (subject.name === subjectName) {
-          const newAttended =
-            action === 'attend' ? subject.attended + 1 : subject.attended;
-          const newTotal = subject.total + 1;
-          return { ...subject, attended: newAttended, total: newTotal };
-        }
-        return subject;
-      })
-    );
-  };
-
-  const handleAddSubject = (newSubjectName: string) => {
-    if (newSubjectName.trim() === '') return;
-    setSubjects((prev) => [
-      ...prev,
-      { name: newSubjectName, attended: 0, total: 0 },
-    ]);
-  };
-
-  const handleResetSubject = (subjectName: string) => {
-    setSubjects((prev) =>
-      prev.map((s) => (s.name === subjectName ? { ...s, attended: 0, total: 0 } : s))
-    );
-  };
-
-  const handleDeleteSubject = (subjectName: string) => {
-    setSubjects((prev) => prev.filter((s) => s.name !== subjectName));
-  };
+  const { 
+    subjects, 
+    loading, 
+    handleAttendanceChange, 
+    addSubject, 
+    resetSubject, 
+    deleteSubject 
+  } = useAppContext();
 
   return (
     <div className="space-y-6">
@@ -70,9 +30,9 @@ export default function AcademicsPage() {
             subjects={subjects}
             loading={loading}
             onAttendanceChange={handleAttendanceChange}
-            onAddSubject={handleAddSubject}
-            onResetSubject={handleResetSubject}
-            onDeleteSubject={handleDeleteSubject}
+            onAddSubject={addSubject}
+            onResetSubject={resetSubject}
+            onDeleteSubject={deleteSubject}
           />
         </TabsContent>
         <TabsContent value="cgpa">

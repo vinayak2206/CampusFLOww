@@ -1,0 +1,201 @@
+
+'use client';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { TimetableEntry, Task, SubjectAttendance } from '@/lib/types';
+import { mockWeeklyTimetable, getInitialAttendance } from '@/lib/data';
+
+interface AppContextType {
+    weeklyTimetable: { [key: string]: TimetableEntry[] };
+    tasks: Task[];
+    subjects: SubjectAttendance[];
+    loading: boolean;
+    moveTaskToSchedule: (task: Task, day: string) => boolean;
+    addTask: (taskName: string) => void;
+    moveTaskToScheduleById: (taskId: number, day: string) => boolean;
+    completeTask: (taskId: number) => void;
+    deleteTask: (taskId: number) => void;
+    replaceTaskWithNext: (day: string, timetableId: number) => void;
+    updateTimetableEntryStatus: (day: string, subjectName: string, action: 'attend' | 'miss' | 'cancel') => void;
+    handleAttendanceChange: (subjectName: string, action: 'attend' | 'miss') => void;
+    addSubject: (newSubjectName: string) => void;
+    resetSubject: (subjectName: string) => void;
+    deleteSubject: (subjectName: string) => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const AppStateProvider = ({ children }: { children: ReactNode }) => {
+    const [weeklyTimetable, setWeeklyTimetable] = useState<{ [key: string]: TimetableEntry[] }>(mockWeeklyTimetable);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [subjects, setSubjects] = useState<SubjectAttendance[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setSubjects(getInitialAttendance());
+        const initialTasks: Task[] = [
+            { id: 1, suggestion: 'Review DSA Lecture 5', type: 'study', duration: '30m', completed: false },
+            { id: 2, suggestion: 'Finish Compiler Design assignment', type: 'coding', duration: '1h', completed: false },
+        ];
+        setTasks(initialTasks);
+        setLoading(false);
+    }, []);
+
+    const moveTaskToSchedule = (task: Task, day: string) => {
+        let taskAddedToTimetable = false;
+        
+        setWeeklyTimetable(prev => {
+            const newWeeklyTimetable = { ...prev };
+            const daySchedule = newWeeklyTimetable[day];
+            if (!daySchedule) return prev;
+
+            const newDaySchedule = daySchedule.map(entry => {
+                if (!taskAddedToTimetable && entry.subject === 'Free Slot') {
+                    taskAddedToTimetable = true;
+                    return { ...entry, subject: task.suggestion, type: 'task' as const };
+                }
+                return entry;
+            });
+            
+            newWeeklyTimetable[day] = newDaySchedule;
+            return newWeeklyTimetable;
+        });
+        
+        return taskAddedToTimetable;
+    };
+
+    const addTask = (taskName: string) => {
+        const newTask: Task = {
+            id: Date.now(),
+            suggestion: taskName,
+            type: 'study', // default type
+            duration: 'Flexible',
+            completed: false,
+        };
+        setTasks(prevTasks => [...prevTasks, newTask]);
+    };
+    
+    const moveTaskToScheduleById = (taskId: number, day: string): boolean => {
+        const taskToMove = tasks.find(t => t.id === taskId);
+        if (taskToMove) {
+            const moved = moveTaskToSchedule(taskToMove, day);
+            if (moved) {
+                setTasks(prev => prev.filter(t => t.id !== taskId));
+                return true;
+            }
+        }
+        return false;
+    };
+
+    const completeTask = (taskId: number) => {
+        setTasks(prev => prev.map(t => t.id === taskId ? {...t, completed: !t.completed} : t));
+    };
+
+    const deleteTask = (taskId: number) => {
+        setTasks(prev => prev.filter(t => t.id !== taskId));
+    };
+
+    const replaceTaskWithNext = (day: string, timetableId: number) => {
+        if (tasks.length > 0) {
+            const nextTask = tasks[0];
+            setTasks(prev => prev.slice(1));
+            setWeeklyTimetable(prev => {
+                const newWeeklyTimetable = {...prev};
+                const daySchedule = newWeeklyTimetable[day];
+                const newDaySchedule = daySchedule.map(entry => {
+                    if (entry.id === timetableId) {
+                        return { ...entry, subject: nextTask.suggestion, type: 'task' as const, status: 'scheduled' as const };
+                    }
+                    return entry;
+                })
+                newWeeklyTimetable[day] = newDaySchedule;
+                return newWeeklyTimetable;
+            })
+        }
+    };
+    
+    const updateTimetableEntryStatus = (day: string, subjectName: string, action: 'attend' | 'miss' | 'cancel') => {
+        setWeeklyTimetable(prev => {
+            const newWeeklyTimetable = { ...prev };
+            const daySchedule = newWeeklyTimetable[day];
+    
+            const newDaySchedule = daySchedule.map(entry => {
+                if (entry.subject === subjectName) {
+                     if (entry.type === 'task' && action === 'attend') {
+                        return { ...entry, subject: 'Free Slot', type: 'break' as const, status: 'scheduled' as const };
+                    }
+                    if (action === 'cancel') {
+                         return { ...entry, status: 'cancelled' as const };
+                    }
+                    return { ...entry, status: action === 'attend' ? 'attended' as const : 'missed' as const };
+                }
+                return entry;
+            });
+    
+            newWeeklyTimetable[day] = newDaySchedule;
+            return newWeeklyTimetable;
+        });
+
+        if (action !== 'cancel') {
+             const entry = weeklyTimetable[day]?.find(e => e.subject === subjectName);
+             if (entry && entry.type === 'lecture') {
+                handleAttendanceChange(subjectName, action);
+            }
+        }
+    };
+    
+    const handleAttendanceChange = (subjectName: string, action: 'attend' | 'miss') => {
+        setSubjects((prevSubjects) =>
+          prevSubjects.map((subject) => {
+            if (subject.name === subjectName) {
+              const newAttended = action === 'attend' ? subject.attended + 1 : subject.attended;
+              const newTotal = subject.total + 1;
+              return { ...subject, attended: newAttended, total: newTotal };
+            }
+            return subject;
+          })
+        );
+    };
+
+    const addSubject = (newSubjectName: string) => {
+        if (newSubjectName.trim() === '') return;
+        setSubjects((prev) => [...prev, { name: newSubjectName, attended: 0, total: 0 }]);
+    };
+
+    const resetSubject = (subjectName: string) => {
+        setSubjects((prev) => prev.map((s) => (s.name === subjectName ? { ...s, attended: 0, total: 0 } : s)));
+    };
+
+    const deleteSubject = (subjectName: string) => {
+        setSubjects((prev) => prev.filter((s) => s.name !== subjectName));
+    };
+
+
+    const value = {
+        weeklyTimetable,
+        tasks,
+        subjects,
+        loading,
+        moveTaskToSchedule,
+        addTask,
+        moveTaskToScheduleById,
+        completeTask,
+        deleteTask,
+        replaceTaskWithNext,
+        updateTimetableEntryStatus,
+        handleAttendanceChange,
+        addSubject,
+        resetSubject,
+        deleteSubject
+    };
+
+    return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export const useAppContext = () => {
+    const context = useContext(AppContext);
+    if (context === undefined) {
+        throw new Error('useAppContext must be used within an AppStateProvider');
+    }
+    return context;
+};
