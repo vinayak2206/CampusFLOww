@@ -134,16 +134,16 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#05070f] via-[#060b1a] to-[#02040b] text-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-950/30 via-transparent to-slate-950/40 pointer-events-none" />
+    <div className="min-h-screen bg-gradient-to-br from-[#efe8ff] via-[#e9e3ff] to-[#e1d7ff] text-slate-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-[#c7b6ff]/40 pointer-events-none" />
       {/* Navigation */}
       <header className="relative max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="h-10 w-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center font-bold">
+          <div className="h-10 w-10 rounded-full bg-white/60 border border-white/70 flex items-center justify-center font-bold">
             CF
           </div>
           <div>
-            <p className="text-sm text-slate-400">CampusFlow</p>
+            <p className="text-sm text-slate-500">CampusFlow</p>
             <p className="font-semibold">AI Scheduler</p>
           </div>
         </div>
@@ -152,13 +152,13 @@ export default function LandingPage() {
             <>
               <button
                 onClick={() => openAuthModal("login")}
-                className="px-4 py-2 rounded-lg border border-white/10 hover:border-white/20 transition"
+                className="px-4 py-2 rounded-lg border border-white/70 hover:border-white transition bg-white/40"
               >
                 Sign In
               </button>
               <button
                 onClick={() => openAuthModal("signup")}
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 font-semibold shadow-[0_0_30px_rgba(59,130,246,0.5)] transition"
+                className="px-4 py-2 rounded-lg bg-[#7c5cff] hover:bg-[#6a4df7] text-white font-semibold shadow-[0_0_30px_rgba(124,92,255,0.35)] transition"
               >
                 Get Started
               </button>
@@ -168,7 +168,7 @@ export default function LandingPage() {
             <button
               onClick={handleLogout}
               disabled={loading}
-              className="px-4 py-2 rounded-lg border border-white/10 hover:border-white/20 transition disabled:opacity-60"
+              className="px-4 py-2 rounded-lg border border-white/70 hover:border-white transition bg-white/40 disabled:opacity-60"
             >
               Logout
             </button>
@@ -179,25 +179,25 @@ export default function LandingPage() {
       {/* Hero */}
       <main className="max-w-6xl mx-auto px-6 pb-12 flex flex-col lg:flex-row items-center gap-10">
         <div className="flex-1 space-y-6">
-          <div className="inline-flex items-center px-4 py-2 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-sm w-fit">
+          <div className="inline-flex items-center px-4 py-2 rounded-full border border-white/70 bg-white/50 text-slate-600 text-sm w-fit">
             AI-powered scheduling
           </div>
           <h1 className="text-5xl md:text-7xl font-bold leading-[0.95] tracking-tight">
-            Never miss a <span className="text-blue-400">deadline</span>.<br />Never waste a <span className="text-blue-400">free slot</span>.
+            Never miss a <span className="text-[#7c5cff]">deadline</span>.<br />Never waste a <span className="text-[#7c5cff]">free slot</span>.
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl">
+          <p className="text-lg text-slate-600 max-w-2xl">
             AI that transforms your scattered timetables, assignments, and grades into an optimized daily schedule. Built for students who want to work smarter, not harder.
           </p>
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => openAuthModal("signup")}
-              className="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 font-semibold shadow-[0_0_30px_rgba(59,130,246,0.5)] transition"
+              className="px-6 py-3 rounded-lg bg-[#7c5cff] hover:bg-[#6a4df7] text-white font-semibold shadow-[0_0_30px_rgba(124,92,255,0.35)] transition"
             >
               Get Started
             </button>
             <button
               onClick={() => openAuthModal("login")}
-              className="px-6 py-3 rounded-lg border border-white/10 hover:border-white/20 transition"
+              className="px-6 py-3 rounded-lg border border-white/70 hover:border-white transition bg-white/40"
             >
               Sign In
             </button>
@@ -205,25 +205,25 @@ export default function LandingPage() {
         </div>
 
         <div className="flex-1 w-full">
-          <div className="glass-card rounded-3xl p-6 border border-white/10 shadow-2xl">
-            <p className="text-sm text-blue-300 mb-2">Today&apos;s schedule</p>
-            <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5 mb-4">
-              <p className="text-slate-200 font-semibold">AI Suggests: Study Data Structures</p>
-              <p className="text-slate-400 text-sm">Exam in 3 days • Low attendance</p>
+          <div className="glass-card rounded-3xl p-6 border border-white/60 shadow-2xl">
+            <p className="text-sm text-slate-500 mb-2">Today&apos;s schedule</p>
+            <div className="bg-white/50 rounded-xl p-4 border border-white/70 mb-4">
+              <p className="text-slate-800 font-semibold">AI Suggests: Study Data Structures</p>
+              <p className="text-slate-500 text-sm">Exam in 3 days • Low attendance</p>
             </div>
-            <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5 mb-4">
-              <p className="text-slate-200 font-semibold">Performance</p>
-              <p className="text-green-400 text-sm mt-1">▲ 12%</p>
-              <div className="mt-2 h-2 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full w-[70%] bg-blue-500" />
+            <div className="bg-white/50 rounded-xl p-4 border border-white/70 mb-4">
+              <p className="text-slate-800 font-semibold">Performance</p>
+              <p className="text-emerald-500 text-sm mt-1">▲ 12%</p>
+              <div className="mt-2 h-2 bg-white/70 rounded-full overflow-hidden">
+                <div className="h-full w-[70%] bg-[#7c5cff]" />
               </div>
-              <p className="text-slate-400 text-xs mt-1">Current GPA • 8.4</p>
+              <p className="text-slate-500 text-xs mt-1">Current GPA • 8.4</p>
             </div>
-            <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5">
-              <p className="text-slate-200 font-semibold">Tasks Completed</p>
-              <p className="text-slate-400 text-sm">23/30</p>
-              <div className="mt-2 h-2 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full w-[76%] bg-indigo-500" />
+            <div className="bg-white/50 rounded-xl p-4 border border-white/70">
+              <p className="text-slate-800 font-semibold">Tasks Completed</p>
+              <p className="text-slate-500 text-sm">23/30</p>
+              <div className="mt-2 h-2 bg-white/70 rounded-full overflow-hidden">
+                <div className="h-full w-[76%] bg-[#8a75ff]" />
               </div>
             </div>
           </div>
@@ -232,11 +232,11 @@ export default function LandingPage() {
 
       {/* Auth Modal */}
       {modalOpen && (
-        <div id="authModal" className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-xl">
-          <div className="relative w-[90%] max-w-md glass-card rounded-2xl border border-white/10 p-8 shadow-[0_0_40px_rgba(59,130,246,0.2)]">
+        <div id="authModal" className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-2xl">
+          <div className="relative w-[90%] max-w-md glass-card rounded-2xl border border-white/70 p-8 shadow-[0_0_40px_rgba(124,92,255,0.2)]">
             <button
               aria-label="Close auth modal"
-              className="absolute top-4 right-4 text-slate-300 hover:text-white"
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-700"
               onClick={closeAuthModal}
             >
               ×
@@ -244,16 +244,16 @@ export default function LandingPage() {
 
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold">{formType === "login" ? "Welcome back" : "Create your account"}</h2>
-              <p className="text-slate-400 text-sm mt-1">{formType === "login" ? "Sign in to continue to CampusFlow" : "Join to optimize your schedule"}</p>
+              <p className="text-slate-500 text-sm mt-1">{formType === "login" ? "Sign in to continue to CampusFlow" : "Join to optimize your schedule"}</p>
             </div>
 
-            {error && <div className="mb-3 text-red-400 text-sm text-center">{error}</div>}
+            {error && <div className="mb-3 text-red-500 text-sm text-center">{error}</div>}
 
             <div className="space-y-3" id={formType === "login" ? "loginForm" : "signupForm"}>
               <div>
-                <label className="text-sm text-slate-300">Email</label>
+                <label className="text-sm text-slate-600">Email</label>
                 <input
-                  className="w-full mt-1 rounded-lg bg-slate-900/60 border border-white/10 px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full mt-1 rounded-lg bg-white/70 border border-white/80 px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7c5cff]/20"
                   type="email"
                   placeholder="student@university.edu"
                   value={email}
@@ -262,9 +262,9 @@ export default function LandingPage() {
               </div>
 
               <div>
-                <label className="text-sm text-slate-300">Password</label>
+                <label className="text-sm text-slate-600">Password</label>
                 <input
-                  className="w-full mt-1 rounded-lg bg-slate-900/60 border border-white/10 px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full mt-1 rounded-lg bg-white/70 border border-white/80 px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7c5cff]/20"
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -272,18 +272,18 @@ export default function LandingPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between text-sm text-slate-400">
+              <div className="flex items-center justify-between text-sm text-slate-500">
                 <label className="inline-flex items-center gap-2">
                   <input type="checkbox" className="accent-blue-500" />
                   Remember me
                 </label>
-                {formType === "login" && <button className="text-blue-400 hover:text-blue-300" type="button">Forgot password?</button>}
+                {formType === "login" && <button className="text-[#7c5cff] hover:text-[#6a4df7]" type="button">Forgot password?</button>}
               </div>
 
               <button
                 onClick={handleEmailPassword}
                 disabled={loading}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold text-lg transition disabled:opacity-60"
+                className="w-full py-3 bg-[#7c5cff] hover:bg-[#6a4df7] text-white rounded-lg font-semibold text-lg transition disabled:opacity-60"
               >
                 {formType === "login" ? "Sign In" : "Sign Up"}
               </button>
@@ -291,15 +291,15 @@ export default function LandingPage() {
               <button
                 onClick={handleGuestAccess}
                 disabled={loading}
-                className="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-semibold text-lg transition disabled:opacity-60"
+                className="w-full py-3 bg-white/70 hover:bg-white rounded-lg font-semibold text-lg transition disabled:opacity-60"
               >
                 Continue as Guest
               </button>
 
               <div className="flex items-center gap-2 my-2">
-                <div className="flex-1 h-px bg-white/10" />
-                <span className="text-xs uppercase tracking-wider text-slate-500">or continue with</span>
-                <div className="flex-1 h-px bg-white/10" />
+                <div className="flex-1 h-px bg-white/70" />
+                <span className="text-xs uppercase tracking-wider text-slate-400">or continue with</span>
+                <div className="flex-1 h-px bg-white/70" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -322,11 +322,11 @@ export default function LandingPage() {
               <div className="text-center text-slate-400 text-sm mt-2">
                 {formType === "login" ? (
                   <span>
-                    Don&apos;t have an account? <button className="text-blue-400 hover:text-blue-300" onClick={toggleAuthForm}>Sign up</button>
+                    Don&apos;t have an account? <button className="text-[#7c5cff] hover:text-[#6a4df7]" onClick={toggleAuthForm}>Sign up</button>
                   </span>
                 ) : (
                   <span>
-                    Already have an account? <button className="text-blue-400 hover:text-blue-300" onClick={toggleAuthForm}>Sign in</button>
+                    Already have an account? <button className="text-[#7c5cff] hover:text-[#6a4df7]" onClick={toggleAuthForm}>Sign in</button>
                   </span>
                 )}
               </div>

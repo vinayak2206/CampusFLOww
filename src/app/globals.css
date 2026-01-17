@@ -86,6 +86,6 @@
 
 @layer components {
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl;
+    @apply bg-white/55 backdrop-blur-xl;
   }
 }
