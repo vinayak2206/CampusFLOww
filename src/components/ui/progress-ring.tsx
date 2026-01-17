@@ -52,7 +52,7 @@ const Progress = React.forwardRef<SVGSVGElement, ProgressProps>(
           />
         </svg>
         <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
-          {Math.round(validValue)}%
+          {/* {Math.round(validValue)}% */}
         </span>
       </div>
     )

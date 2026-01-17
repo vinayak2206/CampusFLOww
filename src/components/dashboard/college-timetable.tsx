@@ -14,17 +14,42 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card";
-  
-  const collegeTimetableData = [
-    { time: '09:00 - 10:00', mon: 'Data Structures', tue: 'Algorithms', wed: 'Data Structures', thu: 'Algorithms', fri: 'Data Structures' },
-    { time: '10:00 - 11:00', mon: 'Algorithms', tue: 'Data Structures', wed: 'Algorithms', thu: 'Data Structures', fri: 'Algorithms' },
-    { time: '11:00 - 12:00', mon: 'Break', tue: 'Break', wed: 'Break', thu: 'Break', fri: 'Break' },
-    { time: '12:00 - 14:00', mon: 'OS Lab', tue: 'DBMS Lab', wed: 'OS Lab', thu: 'DBMS Lab', fri: 'OS Lab' },
-    { time: '14:00 - 15:00', mon: 'Lunch', tue: 'Lunch', wed: 'Lunch', thu: 'Lunch', fri: 'Lunch' },
-    { time: '15:00 - 16:00', mon: 'Maths-3', tue: 'Compiler Design', wed: 'Maths-3', thu: 'Compiler Design', fri: 'Maths-3' },
-  ];
-  
+  import { useAppContext } from '@/context/AppContext';
+
   export function CollegeTimetable() {
+    const { weeklyTimetable } = useAppContext();
+
+    const weekdays = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+
+    const hasAny = weekdays.some(day => (weeklyTimetable[day] || []).length > 0);
+
+    if (!hasAny) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-headline">College Timetable</CardTitle>
+            <CardDescription>
+              Your complete weekly college schedule.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center text-muted-foreground py-8">No timetable available. Upload your timetable to populate this view.</div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // collect unique time ranges across weekdays
+    const timeSet = new Set<string>();
+    weekdays.forEach(day => {
+      (weeklyTimetable[day] || []).forEach(entry => {
+        const timeRange = `${entry.startTime} - ${entry.endTime}`;
+        timeSet.add(timeRange);
+      });
+    });
+
+    const timeRanges = Array.from(timeSet).sort();
+
     return (
       <Card>
         <CardHeader>
@@ -46,14 +71,13 @@ import {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {collegeTimetableData.map((row) => (
-                <TableRow key={row.time}>
-                  <TableCell className="font-medium">{row.time}</TableCell>
-                  <TableCell>{row.mon}</TableCell>
-                  <TableCell>{row.tue}</TableCell>
-                  <TableCell>{row.wed}</TableCell>
-                  <TableCell>{row.thu}</TableCell>
-                  <TableCell>{row.fri}</TableCell>
+              {timeRanges.map(time => (
+                <TableRow key={time}>
+                  <TableCell className="font-medium">{time}</TableCell>
+                  {weekdays.map(day => {
+                    const entry = (weeklyTimetable[day] || []).find(e => `${e.startTime} - ${e.endTime}` === time);
+                    return <TableCell key={day}>{entry ? entry.subject : ''}</TableCell>;
+                  })}
                 </TableRow>
               ))}
             </TableBody>

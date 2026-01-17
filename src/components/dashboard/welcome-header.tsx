@@ -25,6 +25,10 @@ export default function WelcomeHeader() {
   const [draftName, setDraftName] = useState('');
   const router = useRouter();
 
+  const handleGoToUpload = () => {
+    router.push('/dashboard/academics?tab=timetable-upload&open=1');
+  };
+
   useEffect(() => {
     const currentHour = new Date().getHours();
     if (currentHour < 12) {
@@ -174,7 +178,13 @@ export default function WelcomeHeader() {
           </div>
         )}
       </div>
-      <div>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={handleGoToUpload}
+          className="px-3 py-2 rounded-md border border-white/70 bg-white/50 text-sm text-slate-700 hover:bg-white"
+        >
+          Upload Timetable
+        </button>
         <button
           onClick={handleLogout}
           disabled={loading}

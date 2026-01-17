@@ -3,10 +3,10 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import type { TimetableEntry, Task, SubjectAttendance } from '@/lib/types';
-import { mockWeeklyTimetable } from '@/lib/data';
 import { auth } from '@/firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
-import { saveTimetableDay, saveUserState, watchTimetable, watchUserState } from '@/firebase/firestore';
+import { saveTimetableDay, saveUserState, watchTimetable, watchUserState, watchUser } from '@/firebase/firestore';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface AppContextType {
     weeklyTimetable: { [key: string]: TimetableEntry[] };
@@ -39,14 +39,27 @@ const getSubjectsFromTimetable = (timetable: { [key: string]: TimetableEntry[] }
     });
 
     return Array.from(subjectNames).map(name => ({
-        name: name,
-        attended: Math.floor(Math.random() * 10) + 15,
-        total: Math.floor(Math.random() * 5) + 25,
+        name,
+        attended: 0,
+        total: 0,
     }));
 };
 
+const emptyWeeklyTimetable = (): { [key: string]: TimetableEntry[] } => ({
+    Sunday: [],
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+});
+
 export const AppStateProvider = ({ children }: { children: ReactNode }) => {
-    const [weeklyTimetable, setWeeklyTimetable] = useState<{ [key: string]: TimetableEntry[] }>(mockWeeklyTimetable);
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const [weeklyTimetable, setWeeklyTimetable] = useState<{ [key: string]: TimetableEntry[] }>(emptyWeeklyTimetable());
     const [tasks, setTasks] = useState<Task[]>([]);
     const [subjects, setSubjects] = useState<SubjectAttendance[]>([]);
     const [loading, setLoading] = useState(true);
@@ -56,10 +69,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     const lastTaskSync = useRef('');
     const guestAttemptedRef = useRef(false);
 
-    const initialTasks: Task[] = [
-        { id: 1, suggestion: 'Review DSA Lecture 5', type: 'study', duration: '30m', completed: false },
-        { id: 2, suggestion: 'Finish Compiler Design assignment', type: 'coding', duration: '1h', completed: false },
-    ];
+    const initialTasks: Task[] = [];
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -76,11 +86,25 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
         return () => unsubscribe();
     }, []);
 
+    // Redirect to onboarding if user exists but hasn't completed onboarding
+    useEffect(() => {
+        if (!uid) return;
+
+        const unsub = watchUser(uid, (data) => {
+            const onboarded = (data as any)?.onboarded === true;
+            if (!onboarded && pathname !== '/onboarding') {
+                router.push('/onboarding');
+            }
+        });
+
+        return () => unsub();
+    }, [uid, pathname, router]);
+
     useEffect(() => {
         if (!uid) {
-            setWeeklyTimetable(mockWeeklyTimetable);
+            setWeeklyTimetable(emptyWeeklyTimetable());
             setTasks(initialTasks);
-            setSubjects(getSubjectsFromTimetable(mockWeeklyTimetable));
+            setSubjects([]);
             setLoading(false);
             hydrationRef.current = true;
             return;
@@ -92,7 +116,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
             if (data) {
                 setWeeklyTimetable((prev) => ({ ...prev, ...(data as { [key: string]: TimetableEntry[] }) }));
             } else {
-                setWeeklyTimetable(mockWeeklyTimetable);
+                setWeeklyTimetable(emptyWeeklyTimetable());
             }
         });
 
@@ -101,7 +125,6 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
                 ? ((data as { tasks?: Task[] }).tasks as Task[])
                 : initialTasks;
             setTasks(nextTasks);
-            setSubjects(getSubjectsFromTimetable(mockWeeklyTimetable));
             setLoading(false);
             hydrationRef.current = false;
         });
@@ -111,6 +134,11 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
             unsubState();
         };
     }, [uid]);
+
+    // Recompute subjects whenever timetable changes
+    useEffect(() => {
+        setSubjects(getSubjectsFromTimetable(weeklyTimetable));
+    }, [weeklyTimetable]);
 
     useEffect(() => {
         if (!uid || hydrationRef.current) {
