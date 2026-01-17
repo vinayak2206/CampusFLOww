@@ -41,13 +41,18 @@ export async function saveTimetableSlots(uid: string, slots: any[]) {
       endTime = parts[1];
     }
 
+    const allowedStatus = new Set(['scheduled', 'cancelled', 'attended', 'missed']);
+    const normalizedStatus = s.status === 'free'
+      ? 'scheduled'
+      : (allowedStatus.has(s.status) ? s.status : 'scheduled');
+
     byDay[day].push({
       id: Date.now() + Math.floor(Math.random() * 1000),
       day,
       subject: s.subject ?? 'Free Slot',
       startTime,
       endTime,
-      status: s.status === 'free' ? 'scheduled' : (s.status || 'scheduled'),
+      status: normalizedStatus,
       type: s.status === 'free' ? 'break' : 'lecture',
     });
   }

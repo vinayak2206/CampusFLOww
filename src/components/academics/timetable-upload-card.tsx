@@ -7,10 +7,12 @@ import { toStructuredSlots } from '@/lib/timetable/toStructuredSlots';
 import { saveTimetableSlots } from '@/firebase/timetable';
 import { auth } from '@/firebase/auth';
 import { TIME_SLOTS } from '@/utils/timetableParser';
+import { useAppContext } from '@/context/AppContext';
 
 export function TimetableUploadCard() {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState<any>(null);
+  const { tasks, addTask } = useAppContext();
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -58,6 +60,16 @@ export function TimetableUploadCard() {
       setLoading(true);
       const slots = toStructuredSlots(output.normalized, uid);
       await saveTimetableSlots(uid, slots);
+      const defaultTasks = [
+        'Review notes',
+        'Finish assignment',
+        'Practice problems',
+        'Project work',
+      ];
+      const existing = new Set(tasks.map((task) => task.suggestion));
+      const toAdd = defaultTasks.filter((task) => !existing.has(task));
+      const missingCount = Math.max(0, 4 - tasks.length);
+      toAdd.slice(0, missingCount).forEach((task) => addTask(task));
       alert('✅ Timetable saved to your account');
       setOutput(null);
     } catch (err) {
