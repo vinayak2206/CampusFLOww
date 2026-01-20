@@ -2,7 +2,6 @@
 
 import { CgpaCalculatorCard } from '@/components/academics/cgpa-calculator-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 
@@ -56,138 +55,135 @@ export default function TrackerPage() {
   return (
     <div className="mx-auto w-full max-w-[980px] space-y-6">
       <h1 className="font-headline text-3xl font-bold tracking-tighter">Tracker</h1>
-      <Tabs defaultValue="assignments">
-        <TabsList className="grid w-full grid-cols-3 bg-white/50 border border-white/60 backdrop-blur-xl shadow-[0_8px_20px_rgba(255,255,255,0.45)]">
-          <TabsTrigger value="assignments">Assignment Tracker</TabsTrigger>
-          <TabsTrigger value="exams">Exam Tracker</TabsTrigger>
-          <TabsTrigger value="marks">Marks</TabsTrigger>
-        </TabsList>
 
-        <TabsContent value="assignments">
-          <div className="flex justify-end">
-            <button onClick={addAssignment} className="px-3 py-1 rounded bg-slate-900 text-white">Add Assignment</button>
-          </div>
-          <Card className="bg-white/45 backdrop-blur-2xl border border-white/70 shadow-[0_18px_45px_rgba(15,23,42,0.12)] mt-3">
-            <CardHeader>
-              <CardTitle className="font-headline">Assignment Tracker</CardTitle>
+      <section className="grid gap-4 md:grid-cols-3">
+        {/* Assignments Tile */}
+        <Card className="bg-white/45 backdrop-blur-2xl border border-white/70">
+          <CardHeader className="flex items-center justify-between">
+            <div>
+              <CardTitle className="font-headline">Assignments</CardTitle>
               <CardDescription>Keep tabs on upcoming submissions.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {assignments.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-lg border border-white/70 bg-white/60 backdrop-blur-md p-4">
-                  <div className="flex-1">
-                    {item.editing ? (
-                      <div className="flex gap-2">
-                        <input value={item.title} onChange={(e) => updateAssignment(item.id, { title: e.target.value })} className="flex-1 rounded border p-1" />
-                        <input value={item.due} onChange={(e) => updateAssignment(item.id, { due: e.target.value })} className="w-40 rounded border p-1" />
-                      </div>
-                    ) : (
-                      <>
-                        <p className="font-semibold text-slate-800">{item.title}</p>
-                        <p className="text-sm text-slate-500">Due: {item.due}</p>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <select value={item.status} onChange={(e) => updateAssignment(item.id, { status: e.target.value })} className="rounded border p-1">
-                      <option>Pending</option>
-                      <option>In Progress</option>
-                      <option>Done</option>
-                    </select>
-                    {item.editing ? (
-                      <button onClick={() => updateAssignment(item.id, { editing: false })} className="px-2 py-1 rounded bg-green-600 text-white">Save</button>
-                    ) : (
-                      <button onClick={() => updateAssignment(item.id, { editing: true })} className="px-2 py-1 rounded border">Edit</button>
-                    )}
-                    <button onClick={() => removeAssignment(item.id)} className="px-2 py-1 rounded border text-red-600">Delete</button>
-                  </div>
+            </div>
+            <div>
+              <button onClick={addAssignment} className="px-3 py-1 rounded bg-slate-900 text-white">Add</button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {assignments.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-lg border border-white/70 bg-white/60 backdrop-blur-md p-4">
+                <div className="flex-1">
+                  {item.editing ? (
+                    <div className="flex gap-2">
+                      <input value={item.title} onChange={(e) => updateAssignment(item.id, { title: e.target.value })} className="flex-1 rounded border p-1" />
+                      <input value={item.due} onChange={(e) => updateAssignment(item.id, { due: e.target.value })} className="w-40 rounded border p-1" />
+                    </div>
+                  ) : (
+                    <>
+                      <p className="font-semibold text-slate-800">{item.title}</p>
+                      <p className="text-sm text-slate-500">Due: {item.due}</p>
+                    </>
+                  )}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                <div className="flex items-center gap-2">
+                  <select value={item.status} onChange={(e) => updateAssignment(item.id, { status: e.target.value })} className="rounded border p-1">
+                    <option>Pending</option>
+                    <option>In Progress</option>
+                    <option>Done</option>
+                  </select>
+                  {item.editing ? (
+                    <button onClick={() => updateAssignment(item.id, { editing: false })} className="px-2 py-1 rounded bg-green-600 text-white">Save</button>
+                  ) : (
+                    <button onClick={() => updateAssignment(item.id, { editing: true })} className="px-2 py-1 rounded border">Edit</button>
+                  )}
+                  <button onClick={() => removeAssignment(item.id)} className="px-2 py-1 rounded border text-red-600">Delete</button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
 
-        <TabsContent value="exams">
-          <div className="flex justify-end">
-            <button onClick={addExam} className="px-3 py-1 rounded bg-slate-900 text-white">Add Exam</button>
-          </div>
-          <Card className="bg-white/45 backdrop-blur-2xl border border-white/70 shadow-[0_18px_45px_rgba(15,23,42,0.12)] mt-3">
-            <CardHeader>
-              <CardTitle className="font-headline">Exam Tracker</CardTitle>
+        {/* Exams Tile */}
+        <Card className="bg-white/45 backdrop-blur-2xl border border-white/70">
+          <CardHeader className="flex items-center justify-between">
+            <div>
+              <CardTitle className="font-headline">Exams</CardTitle>
               <CardDescription>Upcoming exams at a glance.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {exams.map((item) => (
-                <div key={item.id} className="flex items-center justify-between rounded-lg border border-white/70 bg-white/60 backdrop-blur-md p-4">
-                  <div className="flex-1">
-                    {item.editing ? (
-                      <div className="flex gap-2">
-                        <input value={item.title} onChange={(e) => updateExam(item.id, { title: e.target.value })} className="flex-1 rounded border p-1" />
-                        <input value={item.date} onChange={(e) => updateExam(item.id, { date: e.target.value })} className="w-32 rounded border p-1" />
-                        <input value={item.time} onChange={(e) => updateExam(item.id, { time: e.target.value })} className="w-28 rounded border p-1" />
-                      </div>
-                    ) : (
-                      <>
-                        <p className="font-semibold text-slate-800">{item.title}</p>
-                        <p className="text-sm text-slate-500">{item.date} • {item.time}</p>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {item.editing ? (
-                      <button onClick={() => updateExam(item.id, { editing: false })} className="px-2 py-1 rounded bg-green-600 text-white">Save</button>
-                    ) : (
-                      <button onClick={() => updateExam(item.id, { editing: true })} className="px-2 py-1 rounded border">Edit</button>
-                    )}
-                    <button onClick={() => removeExam(item.id)} className="px-2 py-1 rounded border text-red-600">Delete</button>
-                  </div>
+            </div>
+            <div>
+              <button onClick={addExam} className="px-3 py-1 rounded bg-slate-900 text-white">Add</button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {exams.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-lg border border-white/70 bg-white/60 backdrop-blur-md p-4">
+                <div className="flex-1">
+                  {item.editing ? (
+                    <div className="flex gap-2">
+                      <input value={item.title} onChange={(e) => updateExam(item.id, { title: e.target.value })} className="flex-1 rounded border p-1" />
+                      <input value={item.date} onChange={(e) => updateExam(item.id, { date: e.target.value })} className="w-32 rounded border p-1" />
+                      <input value={item.time} onChange={(e) => updateExam(item.id, { time: e.target.value })} className="w-28 rounded border p-1" />
+                    </div>
+                  ) : (
+                    <>
+                      <p className="font-semibold text-slate-800">{item.title}</p>
+                      <p className="text-sm text-slate-500">{item.date} • {item.time}</p>
+                    </>
+                  )}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                <div className="flex items-center gap-2">
+                  {item.editing ? (
+                    <button onClick={() => updateExam(item.id, { editing: false })} className="px-2 py-1 rounded bg-green-600 text-white">Save</button>
+                  ) : (
+                    <button onClick={() => updateExam(item.id, { editing: true })} className="px-2 py-1 rounded border">Edit</button>
+                  )}
+                  <button onClick={() => removeExam(item.id)} className="px-2 py-1 rounded border text-red-600">Delete</button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
 
-        <TabsContent value="marks">
-          <div className="flex justify-end">
-            <button onClick={addMark} className="px-3 py-1 rounded bg-slate-900 text-white">Add Mark</button>
-          </div>
-          <div className="space-y-6">
-            <Card className="bg-white/45 backdrop-blur-2xl border border-white/70 shadow-[0_18px_45px_rgba(15,23,42,0.12)] mt-3">
-              <CardHeader>
-                <CardTitle className="font-headline">Marks</CardTitle>
-                <CardDescription>Scores for your latest assessments.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {marks.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg border border-white/70 bg-white/60 backdrop-blur-md p-4">
-                    <div className="flex-1">
-                      {item.editing ? (
-                        <div className="flex gap-2">
-                          <input value={item.subject} onChange={(e) => updateMark(item.id, { subject: e.target.value })} className="flex-1 rounded border p-1" />
-                          <input value={item.score} onChange={(e) => updateMark(item.id, { score: e.target.value })} className="w-32 rounded border p-1" />
-                        </div>
-                      ) : (
-                        <p className="font-semibold text-slate-800">{item.subject}</p>
-                      )}
+        {/* Marks Tile */}
+        <Card className="bg-white/45 backdrop-blur-2xl border border-white/70">
+          <CardHeader className="flex items-center justify-between">
+            <div>
+              <CardTitle className="font-headline">Marks</CardTitle>
+              <CardDescription>Scores for your latest assessments.</CardDescription>
+            </div>
+            <div>
+              <button onClick={addMark} className="px-3 py-1 rounded bg-slate-900 text-white">Add</button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {marks.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-lg border border-white/70 bg-white/60 backdrop-blur-md p-4">
+                <div className="flex-1">
+                  {item.editing ? (
+                    <div className="flex gap-2">
+                      <input value={item.subject} onChange={(e) => updateMark(item.id, { subject: e.target.value })} className="flex-1 rounded border p-1" />
+                      <input value={item.score} onChange={(e) => updateMark(item.id, { score: e.target.value })} className="w-32 rounded border p-1" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-[#22c55e] text-white">{item.score}</Badge>
-                      {item.editing ? (
-                        <button onClick={() => updateMark(item.id, { editing: false })} className="px-2 py-1 rounded bg-green-600 text-white">Save</button>
-                      ) : (
-                        <button onClick={() => updateMark(item.id, { editing: true })} className="px-2 py-1 rounded border">Edit</button>
-                      )}
-                      <button onClick={() => removeMark(item.id)} className="px-2 py-1 rounded border text-red-600">Delete</button>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
+                  ) : (
+                    <p className="font-semibold text-slate-800">{item.subject}</p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-[#22c55e] text-white">{item.score}</Badge>
+                  {item.editing ? (
+                    <button onClick={() => updateMark(item.id, { editing: false })} className="px-2 py-1 rounded bg-green-600 text-white">Save</button>
+                  ) : (
+                    <button onClick={() => updateMark(item.id, { editing: true })} className="px-2 py-1 rounded border">Edit</button>
+                  )}
+                  <button onClick={() => removeMark(item.id)} className="px-2 py-1 rounded border text-red-600">Delete</button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+          <div className="p-4">
             <CgpaCalculatorCard />
           </div>
-        </TabsContent>
-      </Tabs>
+        </Card>
+      </section>
     </div>
   );
 }

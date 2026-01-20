@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+console.log("KEY PREFIX:", process.env.GROQ_API_KEY?.slice(0, 4));
 
 export const runtime = "nodejs";
 
